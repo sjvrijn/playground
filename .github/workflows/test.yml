@@ -1,0 +1,32 @@
+name: pytest --last-failed
+
+on:
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+   
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v3
+      with:
+        python-version: 3.11
+
+    - name: Install dependencies
+      run: |
+        pip install pytest
+
+    - name: Register/load pytest cache for --last-failed
+      uses: actions/cache@v3
+      with:
+        path: |
+          .pytest_cache
+        key: pytest-cache-${{github.event.number}}
+
+    - name: Run pytest
+      run: |
+        pytest --last-failed
