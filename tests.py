@@ -9,4 +9,5 @@ def test_3():
     assert 'apple' in basket
 
 def test_4():
+    assert True
     assert False
