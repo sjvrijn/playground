@@ -31,9 +31,11 @@ jobs:
     # Full run of pytest on a missing or empty pytest cache
     - name: Run all tests
       id: run_all
+      env:
+        CACHE_LENGTH: ${{ pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c }}
       if: |
-        ${{ steps.cache.outputs.cache-hit != 'true' ||
-        $(pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c ) -le 5 }}
+        steps.cache.outputs.cache-hit != 'true' ||
+        env.CACHE_LENGTH <= 5 
       run: |
         pytest
 
@@ -49,10 +51,12 @@ jobs:
     # If some tests previously failed, i.e., a non-empty cache exists, run pytest --last-failed
     - name: Run pytest --last-failed
       id: last_failed
+      env:
+        CACHE_LENGTH: ${{ pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c }}
       if: |
-        ${{ steps.run_all.outcome != 'skipped' &&
+        steps.run_all.outcome != 'skipped' &&
         steps.cache.outputs.cache-hit == 'true' &&
-        $(pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c ) -gt 5 }}
+        env.CACHE_LENGTH > 5
       run: |
         pytest --last-failed
 
