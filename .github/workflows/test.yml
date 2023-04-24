@@ -34,7 +34,6 @@ jobs:
 
     # Full run of pytest on a missing or empty pytest cache
     - name: Run all tests
-      continue-on-error: true
       id: run_all
       if: |
         steps.cache.outputs.cache-hit != 'true' ||
@@ -44,21 +43,22 @@ jobs:
 
     - name: Cache .pytest_cache for future --last-failed
       uses: actions/cache/save@v3
-      if: steps.run_all.outcome == 'failure'
+      if: always() && steps.run_all.outcome == 'failure'
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}
 
     - name: Check cache length (again)
+      if: always() && steps.run_all.outcome == 'failure'
       run: |
         echo "CACHE_LENGTH=$( pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c )" >> "$GITHUB_ENV"
 
 
     # If some tests previously failed, i.e., a non-empty cache exists, run pytest --last-failed
     - name: Run pytest --last-failed
-      continue-on-error: true
       id: last_failed
       if: |
+        always() &&
         steps.run_all.outcome != 'skipped' &&
         steps.cache.outputs.cache-hit == 'true' &&
         env.CACHE_LENGTH > 5
@@ -66,7 +66,7 @@ jobs:
         pytest --last-failed tests.py
 
     - uses: actions/cache/save@v3
-      if: steps.last_failed.outcome != 'skipped'
+      if: always() && steps.last_failed.outcome != 'skipped'
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}
@@ -75,16 +75,15 @@ jobs:
 
     # If all tests from pytest --last-failed succeeded, run all tests with a clean cache
     - name: With last failed fixed, run all tests
-      continue-on-error: true
       id: alltests
-      if: steps.last_failed.outcome == 'success'
+      if: always() && steps.last_failed.outcome == 'success'
       run: |
         pytest --cache-clear tests.py
 
     # Update cache again for future runs
     - name: Update pytest cache
       uses: actions/cache/save@v3
-      if: steps.last_failed.outcome == 'success'
+      if: always() && steps.last_failed.outcome == 'success'
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}  
