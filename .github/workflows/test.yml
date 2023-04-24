@@ -9,30 +9,72 @@ jobs:
     runs-on: ubuntu-latest
    
     steps:
+    # Setup
     - uses: actions/checkout@v3
-
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
         python-version: 3.11
-
     - name: Install dependencies
       run: |
         pip install pytest
 
-    - name: Register/load pytest cache for --last-failed
-      uses: actions/cache@v3
+
+    # Initial restore of cache, if it exists
+    - uses: actions/cache/restore@v3
+      id: cache
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}
 
-    - name: Run pytest
+
+    # Full run of pytest on a missing or empty pytest cache
+    - name: Run all tests
+      id: run_all
+      if: |
+        steps.cache.outputs.cache-hit != 'true' ||
+        test $(pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c ) -le 5
       run: |
-        pytest --last-failed tests.py
+        pytest
+
+    - name: Cache .pytest_cache for future --last-failed
+      uses: actions/cache/save@v3
+      if: steps.run_all.outcome == 'failure'
+      with:
+        path: .pytest_cache
+        key: pytest-cache-${{github.event.number}}
+
+
+
+    # If some tests previously failed, i.e., a non-empty cache exists, run pytest --last-failed
+    - name: Run pytest --last-failed
+      id: last_failed
+      if: |
+        steps.run_all.outcome != 'skipped' &&
+        steps.cache.outputs.cache-hit == 'true' &&
+        test $(pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c ) -gt 5
+      run: |
+        pytest --last-failed
 
     - uses: actions/cache/save@v3
-      if: always()
+      if: ! steps.last_failed.outcome == 'skipped'
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}
 
+
+
+    # If all tests from pytest --last-failed succeeded, run all tests with a clean cache
+    - name: With last failed fixed, run all tests
+      id: alltests
+      if: steps.last_failed.outcome == 'success'
+      run: |
+        pytest --cache-clear
+
+    # Update cache again for future runs
+    - name: Update pytest cache
+      uses: actions/cache/save@v3
+      if: steps.last_failed.outcome == 'success'
+      with:
+        path: .pytest_cache
+        key: pytest-cache-${{github.event.number}}  
