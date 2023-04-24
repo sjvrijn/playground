@@ -68,7 +68,7 @@ jobs:
         pytest --last-failed tests.py
 
     - uses: actions/cache/save@v3
-      if: always() && steps.last_failed.outcome != 'success' && steps.last_failed.outcome != 'failure'
+      if: always() && ( steps.last_failed.outcome == 'success' || steps.last_failed.outcome == 'failure' )
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}
