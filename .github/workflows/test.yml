@@ -33,7 +33,7 @@ jobs:
       id: run_all
       if: |
         steps.cache.outputs.cache-hit != 'true' ||
-        test $(pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c ) -le 5
+        $(pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c ) -le 5
       run: |
         pytest
 
