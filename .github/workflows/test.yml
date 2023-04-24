@@ -50,9 +50,9 @@ jobs:
     - name: Run pytest --last-failed
       id: last_failed
       if: |
-        ${{ steps.run_all.outcome != 'skipped' &&
+        steps.run_all.outcome != 'skipped' &&
         steps.cache.outputs.cache-hit == 'true' &&
-        test $(pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c ) -gt 5 }}
+        $(pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c ) -gt 5
       run: |
         pytest --last-failed
 
