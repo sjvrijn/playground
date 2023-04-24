@@ -26,6 +26,8 @@ jobs:
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}
+        restore-keys:
+          pytest-cache-${{github.event.number}}-
 
     - name: Check cache length
       run: |
@@ -48,7 +50,7 @@ jobs:
       if: always() && steps.run_all.outcome == 'failure'
       with:
         path: .pytest_cache
-        key: pytest-cache-${{github.event.number}}
+        key: pytest-cache-${{github.event.number}}-${{github.run_id}}
 
     - name: Check cache length (again)
       if: always() && steps.run_all.outcome == 'failure'
@@ -71,7 +73,7 @@ jobs:
       if: always() && ( steps.last_failed.outcome == 'success' || steps.last_failed.outcome == 'failure' )
       with:
         path: .pytest_cache
-        key: pytest-cache-${{github.event.number}}
+        key: pytest-cache-${{github.event.number}}-${{github.run_id}}
 
 
 
