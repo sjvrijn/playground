@@ -29,7 +29,9 @@ jobs:
 
     - name: Check cache length
       run: |
-        echo "CACHE_LENGTH=$( pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c )" >> "$GITHUB_ENV"
+        echo "CACHE_LENGTH=$( pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c )" >> "$GITHUB_ENV" &&
+        echo "CACHE_LENGTH=$( pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c )"
+
 
 
     # Full run of pytest on a missing or empty pytest cache
@@ -59,14 +61,14 @@ jobs:
       id: last_failed
       if: |
         always() &&
-        steps.run_all.outcome != 'skipped' &&
+        steps.run_all.outcome != 'success' && steps.run_all.outcome != 'failure' &&
         steps.cache.outputs.cache-hit == 'true' &&
         env.CACHE_LENGTH > 5
       run: |
         pytest --last-failed tests.py
 
     - uses: actions/cache/save@v3
-      if: always() && steps.last_failed.outcome != 'skipped'
+      if: always() && steps.last_failed.outcome != 'success' && steps.last_failed.outcome != 'failure'
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}
