@@ -3,3 +3,10 @@ def test_1():
     
 def test_2():
     assert 1+1 == 2
+
+def test_3():
+    basket = {'apple', 'banana', 'cranberry'}
+    assert 'apple' in basket
+
+def test_4():
+    assert False
