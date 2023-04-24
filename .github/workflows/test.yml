@@ -39,7 +39,7 @@ jobs:
         steps.cache.outputs.cache-hit != 'true' ||
         env.CACHE_LENGTH <= 5 
       run: |
-        pytest
+        pytest tests.py
 
     - name: Cache .pytest_cache for future --last-failed
       uses: actions/cache/save@v3
@@ -61,7 +61,7 @@ jobs:
         steps.cache.outputs.cache-hit == 'true' &&
         env.CACHE_LENGTH > 5
       run: |
-        pytest --last-failed
+        pytest --last-failed tests.py
 
     - uses: actions/cache/save@v3
       if: steps.last_failed.outcome != 'skipped'
@@ -76,7 +76,7 @@ jobs:
       id: alltests
       if: steps.last_failed.outcome == 'success'
       run: |
-        pytest --cache-clear
+        pytest --cache-clear tests.py
 
     # Update cache again for future runs
     - name: Update pytest cache
