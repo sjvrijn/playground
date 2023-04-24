@@ -57,7 +57,7 @@ jobs:
         pytest --last-failed
 
     - uses: actions/cache/save@v3
-      if: ! steps.last_failed.outcome == 'skipped'
+      if: steps.last_failed.outcome != 'skipped'
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}
