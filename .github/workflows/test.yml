@@ -29,4 +29,4 @@ jobs:
 
     - name: Run pytest
       run: |
-        pytest --last-failed
+        pytest --last-failed tests.py
