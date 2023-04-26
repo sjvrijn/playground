@@ -28,12 +28,10 @@ jobs:
         key: pytest-cache-${{github.event.number}}
         restore-keys:
           pytest-cache-${{github.event.number}}-
-
+    # Determine if pytests's lastfailed cache contains any entries
     - name: Check cache length
       run: |
         echo "CACHE_LENGTH=$( pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c )" >> "$GITHUB_ENV"
-
-
 
     # Full run of pytest on a missing or empty pytest cache
     - name: Run all tests
@@ -43,14 +41,6 @@ jobs:
         env.CACHE_LENGTH <= 5 
       run: |
         pytest tests.py
-
-    - name: Cache .pytest_cache for future --last-failed
-      uses: actions/cache/save@v3
-      if: always() && steps.run_all.outcome == 'failure'
-      with:
-        path: .pytest_cache
-        key: pytest-cache-${{github.event.number}}-${{github.run_id}}
-
 
     # If some tests previously failed, i.e., a non-empty cache exists, run pytest --last-failed
     - name: Run pytest --last-failed
@@ -63,14 +53,6 @@ jobs:
       run: |
         pytest --last-failed tests.py
 
-    - uses: actions/cache/save@v3
-      if: always() && steps.last_failed.outcome == 'failure'
-      with:
-        path: .pytest_cache
-        key: pytest-cache-${{github.event.number}}-${{github.run_id}}
-
-
-
     # If all tests from pytest --last-failed succeeded, run all tests with a clean cache
     - name: With last failed fixed, run all tests
       id: alltests
@@ -78,10 +60,10 @@ jobs:
       run: |
         pytest --cache-clear tests.py
 
-    # Update cache again for future runs
+    # Save pytest cache for future runs
     - name: Update pytest cache
       uses: actions/cache/save@v3
-      if: always() && steps.last_failed.outcome == 'success'
+      if: always()
       with:
         path: .pytest_cache
         key: pytest-cache-${{github.event.number}}-${{github.run_id}}
