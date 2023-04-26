@@ -8,4 +8,4 @@ def test_3():
     assert (1 == 2) is False
 
 def test_4():
-    assert len([]) == 1
+    assert len([]) == 0
