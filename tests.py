@@ -9,3 +9,6 @@ def test_3():
 
 def test_4():
     assert len([]) == 0
+
+def test_5():
+    assert False is False
