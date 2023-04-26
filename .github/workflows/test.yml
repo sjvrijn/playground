@@ -40,7 +40,7 @@ jobs:
         steps.cache.outputs.cache-hit != 'true' ||
         env.CACHE_LENGTH <= 5 
       run: |
-        pytest tests.py
+        pytest
 
     # If some tests previously failed, i.e., a non-empty cache exists, run pytest --last-failed
     - name: Run pytest --last-failed
@@ -51,14 +51,14 @@ jobs:
         steps.cache.outputs.cache-hit == 'true' &&
         env.CACHE_LENGTH > 5
       run: |
-        pytest --last-failed tests.py
+        pytest --last-failed
 
     # If all tests from pytest --last-failed succeeded, run all tests with a clean cache
     - name: With last failed fixed, run all tests
       id: alltests
       if: always() && steps.last_failed.outcome == 'success'
       run: |
-        pytest --cache-clear tests.py
+        pytest --cache-clear
 
     # Save pytest cache for future runs
     - name: Update pytest cache
