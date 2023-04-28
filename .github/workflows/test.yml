@@ -31,32 +31,24 @@ jobs:
     # Determine if pytests's lastfailed cache contains any entries
     - name: Check cache length
       run: |
-        echo "CACHE_LENGTH=$( pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c )" >> "$GITHUB_ENV"
-
-    # Full run of pytest on a missing or empty pytest cache
-    - name: Run all tests
-      id: run_all
-      if: |
-        steps.cache.outputs.cache-hit != 'true' ||
-        env.CACHE_LENGTH <= 5 
-      run: |
-        pytest
+        echo "CACHE_OUTPUT_LENGTH=$( pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c )" >> "$GITHUB_ENV"
 
     # If some tests previously failed, i.e., a non-empty cache exists, run pytest --last-failed
     - name: Run pytest --last-failed
       id: last_failed
       if: |
         always() &&
-        steps.run_all.outcome != 'success' && steps.run_all.outcome != 'failure' &&
         steps.cache.outputs.cache-hit == 'true' &&
-        env.CACHE_LENGTH > 5
+        env.CACHE_OUTPUT_LENGTH > 5
       run: |
         pytest --last-failed
 
     # If all tests from pytest --last-failed succeeded, run all tests with a clean cache
     - name: With last failed fixed, run all tests
       id: alltests
-      if: always() && steps.last_failed.outcome == 'success'
+      if: |
+        always() &&
+        ( steps.last_failed.outcome == 'success' || steps.last_failed.outcome == 'skipped' )
       run: |
         pytest --cache-clear
 
