@@ -38,12 +38,12 @@ jobs:
       id: last_failed
       if: |
         always() &&
-        steps.cache.outputs.cache-hit == 'true' &&
         env.CACHE_OUTPUT_LENGTH > 5
       run: |
         pytest --last-failed
 
-    # If all tests from pytest --last-failed succeeded, run all tests with a clean cache
+    # If 'pytest --last-failed' was skipped (i.e. no entries in cache), or succeeded
+    # (i.e. last-failed tests pass again), run all tests with a clean cache
     - name: Run all tests
       id: all_tests
       if: |
@@ -53,9 +53,9 @@ jobs:
         pytest --cache-clear
 
     # debug: display outcome of steps
-    - name: [debug] display outcomes
+    - name: (debug) display outcomes
       if: always()
-      run: echo "${{ github.steps.last_failed.outcome }} ${{ github.steps.all_tests.outcome }}
+      run: echo "${{ steps.last_failed.outcome }} ${{ steps.all_tests.outcome }}"
 
     # Save pytest cache for future runs
     - name: Update pytest cache
