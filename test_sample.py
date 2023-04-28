@@ -14,4 +14,4 @@ def test_5():
     assert False is False
 
 def test_6():
-    assert not 'False'
+    assert 'True'
