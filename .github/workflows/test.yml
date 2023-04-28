@@ -53,7 +53,7 @@ jobs:
         pytest --cache-clear
 
     # debug: display outcome of steps
-    - name: [debug] display outcomes
+    - name: (debug) display outcomes
       if: always()
       run: echo "${{ github.steps.last_failed.outcome }} ${{ github.steps.all_tests.outcome }}
 
