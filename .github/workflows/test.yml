@@ -42,7 +42,8 @@ jobs:
       run: |
         pytest --last-failed
 
-    # If all tests from pytest --last-failed succeeded, run all tests with a clean cache
+    # If 'pytest --last-failed' was skipped (i.e. no entries in cache), or succeeded
+    # (i.e. last-failed tests pass again), run all tests with a clean cache
     - name: Run all tests
       id: all_tests
       if: |
