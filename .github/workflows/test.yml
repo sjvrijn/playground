@@ -55,7 +55,10 @@ jobs:
     # debug: display outcome of steps
     - name: (debug) display outcomes
       if: always()
-      run: echo "${{ github.steps.last_failed.outcome }} ${{ github.steps.all_tests.outcome }}"
+      env:
+        LFOUTCOME: ${{ github.steps.last_failed.outcome }}
+        ALLOUTCOME: ${{ github.steps.all_tests.outcome }}
+      run: echo "$LFOUTCOME $ALLOUTCOME"
 
     # Save pytest cache for future runs
     - name: Update pytest cache
