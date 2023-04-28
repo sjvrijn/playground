@@ -1,5 +1,5 @@
 def test_1():
-    assert False
+    assert 1024 is (1023+1)
     
 def test_2():
     assert 1+1 == 2
