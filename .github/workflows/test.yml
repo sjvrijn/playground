@@ -34,7 +34,7 @@ jobs:
         echo "CACHE_OUTPUT_LENGTH=$( pytest --collect-only -qqq --no-header --no-summary --cache-show cache/lastfailed | sed -n '4 p' | wc -c )" >> "$GITHUB_ENV"
 
     # If some tests previously failed, i.e., a non-empty cache exists, run pytest --last-failed
-    - name: Run pytest --last-failed
+    - name: Run only --last-failed
       id: last_failed
       if: |
         always() &&
@@ -44,13 +44,18 @@ jobs:
         pytest --last-failed
 
     # If all tests from pytest --last-failed succeeded, run all tests with a clean cache
-    - name: With last failed fixed, run all tests
-      id: alltests
+    - name: Run all tests
+      id: all_tests
       if: |
         always() &&
         ( steps.last_failed.outcome == 'success' || steps.last_failed.outcome == 'skipped' )
       run: |
         pytest --cache-clear
+
+    # debug: display outcome of steps
+    - name: [debug] display outcomes
+      if: always()
+      run: echo "${{ github.steps.last_failed.outcome }} ${{ github.steps.all_tests.outcome }}
 
     # Save pytest cache for future runs
     - name: Update pytest cache
