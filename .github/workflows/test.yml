@@ -38,7 +38,6 @@ jobs:
       id: last_failed
       if: |
         always() &&
-        steps.cache.outputs.cache-hit == 'true' &&
         env.CACHE_OUTPUT_LENGTH > 5
       run: |
         pytest --last-failed
@@ -55,10 +54,7 @@ jobs:
     # debug: display outcome of steps
     - name: (debug) display outcomes
       if: always()
-      env:
-        LFOUTCOME: ${{ steps.last_failed.outcome }}
-        ALLOUTCOME: ${{ steps.all_tests.outcome }}
-      run: echo "$LFOUTCOME $ALLOUTCOME | ${{ steps.last_failed.outcome }} ${{ steps.all_tests.outcome }}"
+      run: echo "${{ steps.last_failed.outcome }} ${{ steps.all_tests.outcome }}"
 
     # Save pytest cache for future runs
     - name: Update pytest cache
