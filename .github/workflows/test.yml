@@ -31,7 +31,8 @@ jobs:
         echo "$MY_STRING" > matrix.json
         cat matrix.json
         ls
-        echo "matrix hash: ${{ hashFiles('**/matrix.json') }}"
+        pwd
+        echo "matrix hash: ${{ hashFiles('./matrix.json') }}"
         pip install pytest
 
     - name: pytest (--last-failed)
