@@ -21,7 +21,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
-        MATRIX = "${{ toJson(matrix) }}"
+        MATRIX = "$( ${{ toJson(matrix) }} )"
         echo "$MATRIX" > matrix.json
         echo "${{ hashFiles('matrix.json') }}"
         pip install pytest
