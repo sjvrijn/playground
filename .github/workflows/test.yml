@@ -21,7 +21,7 @@ jobs:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       env:
-        MATRIX: ${{ matrix }}
+        MATRIX: ${{ toJson(matrix) }}
       run: |
         "$MATRIX" > matrix.json
         echo "${{ hashFiles('matrix.json') }}"
