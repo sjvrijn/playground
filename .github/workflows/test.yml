@@ -20,8 +20,10 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
+      env:
+        MATRIX
       run: |
-        ${{ matrix }} >> "matrix.json"
+        "$MATRIX" > matrix.json
         echo "${{ hashFiles('matrix.json') }}"
         pip install pytest
 
