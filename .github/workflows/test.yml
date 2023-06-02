@@ -30,7 +30,7 @@ jobs:
         MY_STRING="${MY_STRING//$'\r'/'%0D'}"
         echo "$MY_STRING" > matrix.json
         cat matrix.json
-        echo "${{ hashFiles('matrix.json') }}"
+        echo "${{ hashFiles('**/matrix.json') }}"
         pip install pytest
 
     - name: pytest (--last-failed)
