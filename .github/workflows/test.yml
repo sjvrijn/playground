@@ -20,10 +20,13 @@ jobs:
       with:
         python-version: ${{ matrix.python-version }}
     - name: Install dependencies
-      env:
-        MATRIX: ${{ toJson(matrix) }}
       run: |
-        "$MATRIX" > matrix.json
+        matrix = "${{ toJson(matrix) }}"
+        matrix = "${matrix//'%'/'%25'}"
+        matrix = "${matrix//$'\n'/'%0A'}"
+        matrix = "${matrix//$'\r'/'%0D'}"
+        echo $matrix
+        echo $matrix > matrix.json
         echo "${{ hashFiles('matrix.json') }}"
         pip install pytest
 
