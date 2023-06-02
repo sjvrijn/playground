@@ -19,7 +19,8 @@ jobs:
         python-version: 3.11
     - name: Install dependencies
       run: |
-        echo `${{ toJson(matrix) }}`
+        echo "${{ toJson(matrix) }}" > matrix.json
+        echo "${{ hashFiles('matrix.json') }}"
         pip install pytest
 
     - name: pytest (--last-failed)
