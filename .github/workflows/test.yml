@@ -28,8 +28,8 @@ jobs:
         MY_STRING="${MY_STRING//'%'/'%25'}"
         MY_STRING="${MY_STRING//$'\n'/'%0A'}"
         MY_STRING="${MY_STRING//$'\r'/'%0D'}"
-        echo $MY_STRING
-        echo "MATRIX_HASH=$($MY_STRING | md5sum | cut -d' ' -f1)" >> $GITHUB_ENV
+        echo "$MY_STRING" > matrix.json
+        "MATRIX_HASH=$(md5sum matrix.json | cut -d' ' -f1)" >> $GITHUB_ENV
 #        pip install pytest
 
     - name: next
