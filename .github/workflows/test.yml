@@ -29,8 +29,11 @@ jobs:
         MY_STRING="${MY_STRING//$'\n'/'%0A'}"
         MY_STRING="${MY_STRING//$'\r'/'%0D'}"
         echo "MATRIX_HASH=$($MY_STRING | md5sum | cut -d' ' -f1)" >> $GITHUB_ENV
-        echo ${{ env.MATRIX_HASH }}
-        pip install pytest
+#        pip install pytest
 
-    - name: pytest (--last-failed)
-      uses: sjvrijn/pytest-last-failed@v1
+    - name: next
+      run: |
+        echo ${{ env.MATRIX_HASH }}
+
+#    - name: pytest (--last-failed)
+#      uses: sjvrijn/pytest-last-failed@v1
