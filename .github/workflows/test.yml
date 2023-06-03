@@ -7,6 +7,10 @@ on:
 jobs:
   tests:
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.10', '3.11']
    
     steps:
     # Setup
@@ -14,10 +18,10 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v3
       with:
-        python-version: 3.11
+        python-version: ${{ matrix.python-version }}
     - name: Install dependencies
       run: |
         pip install pytest
 
     - name: pytest (--last-failed)
-      uses: sjvrijn/pytest-last-failed@v1
+      uses: sjvrijn/pytest-last-failed@v2
